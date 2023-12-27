@@ -18,13 +18,21 @@ const db = new sqlite3.Database("christmas_lists.db");
 
 // Static file setup -- needed for react router to work correctly
 // Serve static files from the 'build' directory
+const path = require("path");
 app.use(express.static(path.join(__dirname, 'build')));
 
 // cors middleware for allowing react to fetch() from server
-var cors = require("cors");
+const cors = require("cors");
+const allowedOrigins = [
+  "https://christmas-list-maker-production.up.railway.app/home",
+  "https://christmas-list-maker-production.up.railway.app/lists",
+  "https://christmas-list-maker-production.up.railway.app/user",
+  "https://christmas-list-maker-production.up.railway.app/logout",
+];
+
 app.use(
   cors({
-    origin: "https://christmas-list-maker-production.up.railway.app",
+    origin: allowedOrigins,
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
     credentials: true,
     preflightContinue: false,
