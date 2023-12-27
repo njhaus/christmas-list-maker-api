@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config({ silent: process.env.NODE_ENV === "production" });
 
 const app = express();
-const port = 3009;
+const port = process.env.PORT;
 
 // Id
 const { v4: uuidv4 } = require("uuid");
@@ -1094,7 +1094,7 @@ app.post("/logout", async (req, res) => {
 
 // TEST ROUTE
 app.get("/", (req, res) => {
-  res.send('database connection working. "/" route accessed.' )
+  res.send('"message": "database connection working. / route accessed."' )
 });
 
 process.on("SIGINT", () => {
