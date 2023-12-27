@@ -128,7 +128,6 @@ app.post("/home/new", async (req, res) => {
 app.post("/home/open", async (req, res) => {
   console.log("/home/open");
   const { title, code } = req.body;
-  console.log(title, code);
   try {
     // Update token
     const listToken = uuidv4();
@@ -236,7 +235,6 @@ app.post("/list/find", async (req, res) => {
         }
       })
     );
-    console.log(getUsers);
 
     return res.send({
       message: "success",
@@ -259,7 +257,6 @@ app.post("/list/find", async (req, res) => {
 app.post("/list/create", async (req, res) => {
   console.log("list/create");
   const { _id, title, users } = req.body;
-  console.log(users);
   const token = req.cookies?.list;
   try {
     // Check token
@@ -296,7 +293,6 @@ app.post("/list/create", async (req, res) => {
       const userId = uuidv4();
       const username = user.name.toLowerCase();
       const listId = getList.id;
-      console.log([userId, username, listId]);
       const getUsers = await new Promise((resolve, reject) =>
         db.all(
           "INSERT INTO users (id, name, _list_id) VALUES (?, ?, ?)",
@@ -330,8 +326,6 @@ app.post("/list/recipients", async (req, res) => {
   if (!token) {
     return res.send({ error: "You are not logged in" });
   }
-
-  console.log(listId, token)
 
   try {
     //  GET LIST TITLE/ID
@@ -371,7 +365,6 @@ app.post("/list/recipients", async (req, res) => {
           }
         })
       );
-      console.log(updateUser);
     }
 
     return res.send({
@@ -390,7 +383,6 @@ app.post("/list/recipients", async (req, res) => {
 app.post("/user/create", async (req, res) => {
   const { listId, name, code } = req.body;
   const token = uuidv4();
-  console.log(listId, name, code);
   try {
     const hashedCode = await new Promise((resolve, reject) =>
       bcrypt.hash(code, saltRounds, function (err, hash) {
@@ -454,7 +446,6 @@ app.post("/user/create", async (req, res) => {
 //ACCESS EXISTING USER ACCESS CODE
 app.post("/user/access", async (req, res) => {
   const { listId, name, code } = req.body;
-  console.log(listId, name, code);
   const token = uuidv4();
   try {
     // Update token
@@ -538,12 +529,10 @@ app.post("/user/access", async (req, res) => {
 app.post("/user/find", async (req, res) => {
   console.log("user/find");
   const token = req.cookies?.user;
-  console.log(token);
   if (!token) {
     return res.send({ message: "No token." });
   }
   try {
-    console.log("hi1");
     //  GET USER
     const getUser = await new Promise((resolve, reject) =>
       db.all(
@@ -559,15 +548,10 @@ app.post("/user/find", async (req, res) => {
       )
     );
 
-    console.log("hi2");
-
     if (getUser.length < 1) {
       console.log("no list found");
       return res.send({ error: "Unable to verify credentials." });
     }
-
-    console.log("hi3");
-    console.log(getUser);
 
     const user = getUser[0];
     return res.send({
@@ -593,7 +577,6 @@ app.post("/user/data", async (req, res) => {
   const userToken = req.cookies?.user;
   // Body finds user being viewed
   const { listId, username } = req.body;
-  console.log(listToken, userToken, listId, username);
 
   if (!listToken || !userToken) {
     return res.send({ error: "Please log in to view this page." });
@@ -637,8 +620,6 @@ app.post("/user/data", async (req, res) => {
       return res.send({ error: "Error finding Viewed User." });
     const viewUserId = viewUser[0].id;
     const viewUserName = viewUser[0].name;
-    console.log("viewUserId");
-    console.log(viewUserId);
 
     // Get user gifts
     const userGifts = await new Promise((resolve, reject) =>
@@ -655,9 +636,6 @@ app.post("/user/data", async (req, res) => {
       )
     );
 
-    console.log("userGifts");
-    console.log(userGifts);
-
     // Get user notes
     const userNotes = await new Promise((resolve, reject) =>
       db.all(
@@ -672,9 +650,6 @@ app.post("/user/data", async (req, res) => {
         }
       )
     );
-
-    console.log("userNotes");
-    console.log(userNotes);
 
     // Users Match? send current user data (only name and link from gifts list)
     if (viewUserId === currentUserId) {
@@ -895,7 +870,6 @@ app.post('/user/gift/buy', async (req, res) => {
   const userToken = req.cookies?.user;
   const { giftId, bought, listId } = req.body;
   // Get user id with token and list id
-  console.log(bought)
   try {
     const viewUser = await new Promise((resolve, reject) =>
       db.all(
@@ -1120,16 +1094,7 @@ app.post("/logout", async (req, res) => {
 
 // TEST ROUTE
 app.get("/", (req, res) => {
-  console.log(req.cookies);
-  db.all("SELECT * FROM lists", (err, rows) => {
-    if (err) {
-      console.error(err.message);
-      res.status(500).send("Internal Server Error");
-      return;
-    }
-    console.log(rows);
-    res.json(rows);
-  });
+  res.send('database connection working. "/" route accessed.' )
 });
 
 process.on("SIGINT", () => {
