@@ -32,12 +32,16 @@ const allowedOrigins = [
 ];
 
 // Post requests
-  cors({
-    origin: "https://christmas-list-maker-production.up.railway.app",
+app.use(
+  cors(
+    {
+    origin: allowedOrigins,
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
     credentials: true,
     preflightContinue: false,
-  });
+    }
+  )
+);
 
 // parse application/x-www-form-urlencoded
 const bodyParser = require("body-parser");
@@ -1108,9 +1112,9 @@ app.post("/logout", async (req, res) => {
 
 
 // Handle all get routes (static single-page front end) by serving the index.html
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+// app.get('/*', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
 
 process.on("SIGINT", () => {
