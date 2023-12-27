@@ -32,16 +32,12 @@ const allowedOrigins = [
 ];
 
 // Post requests
-app.use(
-  cors(
-    {
-    origin: allowedOrigins,
+  cors({
+    origin: "https://christmas-list-maker-production.up.railway.app",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
     credentials: true,
     preflightContinue: false,
-    }
-  )
-);
+  });
 
 // parse application/x-www-form-urlencoded
 const bodyParser = require("body-parser");
@@ -1110,10 +1106,12 @@ app.post("/logout", async (req, res) => {
   res.send({ message: "success" });
 });
 
-// TEST ROUTE
-app.get("/", (req, res) => {
-  res.send('"message": "database connection working. / route accessed."' )
+
+// Handle all get routes (static single-page front end) by serving the index.html
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
+
 
 process.on("SIGINT", () => {
   db.close((err) => {
