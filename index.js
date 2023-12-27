@@ -35,8 +35,8 @@ app.use(
   cors({
     origin: "https://christmas-list-maker-production.up.railway.app",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
-    credentials: true,
-    preflightContinue: false,
+    // credentials: true,
+    // preflightContinue: false,
   })
 );
 
