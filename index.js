@@ -18,6 +18,18 @@ const db = new sqlite3.Database("christmas_lists.db");
 
 
 // cors middleware for allowing react to fetch() from server
+app.use(function (req, res, next) {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://christmas-list-maker-production.up.railway.app"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
 var cors = require("cors");
 app.use(
   cors({
