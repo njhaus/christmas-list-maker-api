@@ -30,23 +30,16 @@ const allowedOrigins = [
   "https://christmas-list-maker-production.up.railway.app/logout/",
 ];
 
-// Get requests (Only for serving static pages)
-app.use(
-  cors({
-    origin: '/',
-    methods: ["GET"],
-    preflightContinue: false,
-  })
-);
-
 // Post requests
 app.use(
-  cors({
-    origin: allowedOrigins,
-    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
-    credentials: true,
-    preflightContinue: false,
-  })
+  cors(
+    // {
+    // origin: allowedOrigins,
+    // methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
+    // credentials: true,
+    // preflightContinue: false,
+    // }
+  )
 );
 
 // parse application/x-www-form-urlencoded
