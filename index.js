@@ -16,34 +16,16 @@ const saltRounds = 10;
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("christmas_lists.db");
 
-
 // cors middleware for allowing react to fetch() from server
-app.use(function (req, res, next) {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "*"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
-
-// var cors = require("cors");
-// app.use(
-//   cors({
-//     origin: "https://christmas-list-maker-production.up.railway.app",
-//     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
-//     // credentials: true,
-//     // preflightContinue: false,
-//   })
-// );
-
-
-// Static file setup -- needed for react router to work correctly
-// Serve static files from the 'build' directory
-app.use(express.static(path.join(__dirname, 'build')));
+var cors = require("cors");
+app.use(
+  cors({
+    origin: "https://christmas-list-maker-production.up.railway.app",
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
+    credentials: true,
+    preflightContinue: false,
+  })
+);
 
 // parse application/x-www-form-urlencoded
 const bodyParser = require("body-parser");
@@ -1111,12 +1093,10 @@ app.post("/logout", async (req, res) => {
   res.send({ message: "success" });
 });
 
-
-// Handle all other routes by serving the index.html
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// TEST ROUTE
+app.get("/", (req, res) => {
+  res.send('"message": "database connection working. / route accessed."' )
 });
-
 
 process.on("SIGINT", () => {
   db.close((err) => {
