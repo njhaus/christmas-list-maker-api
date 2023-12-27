@@ -24,21 +24,22 @@ app.use(express.static(path.join(__dirname, 'build')));
 // cors middleware for allowing react to fetch() from server
 const cors = require("cors");
 const allowedOrigins = [
-  "https://christmas-list-maker-production.up.railway.app/home/",
-  "https://christmas-list-maker-production.up.railway.app/lists/",
-  "https://christmas-list-maker-production.up.railway.app/user/",
-  "https://christmas-list-maker-production.up.railway.app/logout/",
+  "https://christmas-list-maker-production.up.railway.app/",
+  // "https://christmas-list-maker-production.up.railway.app/home/",
+  // "https://christmas-list-maker-production.up.railway.app/lists/",
+  // "https://christmas-list-maker-production.up.railway.app/user/",
+  // "https://christmas-list-maker-production.up.railway.app/logout/",
 ];
 
 // Post requests
 app.use(
   cors(
-    // {
-    // origin: allowedOrigins,
-    // methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
-    // credentials: true,
-    // preflightContinue: false,
-    // }
+    {
+    origin: allowedOrigins,
+    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
+    credentials: true,
+    preflightContinue: false,
+    }
   )
 );
 
