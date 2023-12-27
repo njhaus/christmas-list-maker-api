@@ -16,6 +16,10 @@ const saltRounds = 10;
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("christmas_lists.db");
 
+// Static file setup -- needed for react router to work correctly
+// Serve static files from the 'build' directory
+app.use(express.static(path.join(__dirname, 'build')));
+
 // cors middleware for allowing react to fetch() from server
 var cors = require("cors");
 app.use(
@@ -54,7 +58,15 @@ app.use(session(sessionConfig));
 // Body parser -- parse application/json
 app.use(bodyParser.json());
 
+
 // ++++++++++++++ROUTES+++++++++++++++++++++
+// __________________________________________________________________________________________________________________________________________
+
+// Handle all get routes (static single-page front end) by serving the index.html
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
 // __________________________________________________________________________________________________________________________________________
 
 // CREATE list
