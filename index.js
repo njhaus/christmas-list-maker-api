@@ -16,6 +16,7 @@ const saltRounds = 10;
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("christmas_lists.db");
 
+
 // cors middleware for allowing react to fetch() from server
 var cors = require("cors");
 app.use(
@@ -26,6 +27,11 @@ app.use(
     preflightContinue: false,
   })
 );
+
+
+// Static file setup -- needed for react router to work correctly
+// Serve static files from the 'build' directory
+app.use(express.static(path.join(__dirname, 'build')));
 
 // parse application/x-www-form-urlencoded
 const bodyParser = require("body-parser");
@@ -1093,10 +1099,12 @@ app.post("/logout", async (req, res) => {
   res.send({ message: "success" });
 });
 
-// TEST ROUTE
-app.get("/", (req, res) => {
-  res.send('"message": "database connection working. / route accessed."' )
+
+// Handle all other routes by serving the index.html
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
+
 
 process.on("SIGINT", () => {
   db.close((err) => {
