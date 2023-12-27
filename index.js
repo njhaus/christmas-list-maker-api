@@ -74,12 +74,6 @@ app.use(bodyParser.json());
 // ++++++++++++++ROUTES+++++++++++++++++++++
 // __________________________________________________________________________________________________________________________________________
 
-// Handle all get routes (static single-page front end) by serving the index.html
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-// __________________________________________________________________________________________________________________________________________
 
 // CREATE list
 app.post("/home/new", async (req, res) => {
