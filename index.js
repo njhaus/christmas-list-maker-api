@@ -20,7 +20,7 @@ const db = new sqlite3.Database("christmas_lists.db");
 var cors = require("cors");
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://christmas-list-maker-production.up.railway.app",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
     credentials: true,
     preflightContinue: false,
