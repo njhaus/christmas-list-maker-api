@@ -20,7 +20,7 @@ const db = new sqlite3.Database("christmas_lists.db");
 var cors = require("cors");
 app.use(
   cors({
-    origin: "https://christmas-list-maker-production.up.railway.app",
+    origin: "http://localhost:5173",
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
     credentials: true,
     preflightContinue: false,
@@ -54,12 +54,13 @@ app.use(session(sessionConfig));
 // Body parser -- parse application/json
 app.use(bodyParser.json());
 
+const validation = require('./middleware/joi_validation.js')
 
 // ++++++++++++++ROUTES+++++++++++++++++++++
 // __________________________________________________________________________________________________________________________________________
 
 // CREATE list
-app.post("/home/new", async (req, res) => {
+app.post("/home/new", validation.validateGroup, async (req, res) => {
   const newListId = uuidv4();
   const { title, code } = req.body;
   try {
@@ -126,7 +127,7 @@ app.post("/home/new", async (req, res) => {
 
 // OPEN list
 
-app.post("/home/open", async (req, res) => {
+app.post("/home/open", validation.validateGroup, async (req, res) => {
   console.log("/home/open");
   const { title, code } = req.body;
   try {
@@ -381,7 +382,7 @@ app.post("/list/recipients", async (req, res) => {
 // __________________________________________________________________________________________________________________________________________
 
 //CREATE USER ACCESS CODE
-app.post("/user/create", async (req, res) => {
+app.post("/user/create", validation.validateUserCode,async (req, res) => {
   const { listId, name, code } = req.body;
   const token = uuidv4();
   try {
@@ -445,7 +446,7 @@ app.post("/user/create", async (req, res) => {
 // __________________________________________________________________________________________________________________________________________
 
 //ACCESS EXISTING USER ACCESS CODE
-app.post("/user/access", async (req, res) => {
+app.post("/user/access", validation.validateUserCode, async (req, res) => {
   const { listId, name, code } = req.body;
   const token = uuidv4();
   try {
@@ -577,7 +578,7 @@ app.post("/user/data", async (req, res) => {
   const listToken = req.cookies?.list;
   const userToken = req.cookies?.user;
   // Body finds user being viewed
-  const { listId, username } = req.body;
+  const { listId, name } = req.body;
 
   if (!listToken || !userToken) {
     return res.send({ error: "Please log in to view this page." });
@@ -607,7 +608,7 @@ app.post("/user/data", async (req, res) => {
     const viewUser = await new Promise((resolve, reject) =>
       db.all(
         "SELECT id, name FROM users WHERE name = ? AND _list_id = ?",
-        [username, listId],
+        [name, listId],
         (err, rows) => {
           if (err) {
             reject(err);
@@ -699,7 +700,7 @@ app.post("/user/data", async (req, res) => {
 app.post('/user/gift/new', async (req, res) => {
   
   const userToken = req.cookies?.user;
-  const { newGift, newLink, listId } = req.body;
+  const { giftDescription, link, listId } = req.body;
   // Get user id with token and list id
   try {
     const viewUser = await new Promise((resolve, reject) =>
@@ -724,7 +725,7 @@ app.post('/user/gift/new', async (req, res) => {
     const newGiftSaved = await new Promise((resolve, reject) =>
       db.all(
         "INSERT INTO gifts (id, description, link, _user_id) VALUES (?, ?, ?, ?)",
-        [newGiftId, newGift, newLink, viewUserId],
+        [newGiftId, giftDescription, link, viewUserId],
         (err, rows) => {
           if (err) {
             reject(err);
@@ -738,8 +739,8 @@ app.post('/user/gift/new', async (req, res) => {
       message: "success",
       newGift: {
         id: newGiftId,
-        description: newGift,
-        link: newLink,
+        description: giftDescription,
+        link: link,
       }
     });
 
@@ -758,7 +759,7 @@ app.post('/user/gift/new', async (req, res) => {
 app.post('/user/gift/edit', async (req, res) => {
   
   const userToken = req.cookies?.user;
-  const { giftId, description, link, listId } = req.body;
+  const { giftId, giftDescription, link, listId } = req.body;
   // Get user id with token and list id
   try {
     const viewUser = await new Promise((resolve, reject) =>
@@ -782,7 +783,7 @@ app.post('/user/gift/edit', async (req, res) => {
     const editedGift = await new Promise((resolve, reject) =>
       db.all(
         "UPDATE gifts SET description = ?, link = ? WHERE id = ? AND _user_id = ?",
-        [description, link, giftId, viewUserId],
+        [giftDescription, link, giftId, viewUserId],
         (err, rows) => {
           if (err) {
             reject(err);
@@ -796,7 +797,7 @@ app.post('/user/gift/edit', async (req, res) => {
       message: "success",
       editedGift: {
         id: giftId,
-        description: description,
+        description: giftDescription,
         link: link,
       }
     });
@@ -927,7 +928,7 @@ app.post('/user/gift/buy', async (req, res) => {
 app.post('/user/note/create', async (req, res) => {
   
   const userToken = req.cookies?.user;
-  const { description, listId, username } = req.body;
+  const { noteDescription, listId, username } = req.body;
   // Get the person who note is being wriiten for with user id with name and list id
   try {
     const viewUser = await new Promise((resolve, reject) =>
@@ -970,7 +971,7 @@ app.post('/user/note/create', async (req, res) => {
     const newNoteSaved = await new Promise((resolve, reject) =>
       db.all(
         "INSERT INTO notes (id, description, written_by, _user_id) VALUES (?, ?, ?, ?)",
-        [newNoteId, description, writingUserName, viewUserId],
+        [newNoteId, noteDescription, writingUserName, viewUserId],
         (err, rows) => {
           if (err) {
             reject(err);
@@ -985,7 +986,7 @@ app.post('/user/note/create', async (req, res) => {
       message: "success",
       newNote: {
         id: newNoteId,
-        description: description,
+        description: noteDescription,
         written_by: writingUserName
       }
     });
@@ -1005,13 +1006,13 @@ app.post('/user/note/create', async (req, res) => {
 app.post('/user/note/delete', async (req, res) => {
   
   const userToken = req.cookies?.user;
-  const { listId, username, noteId, currentUser } = req.body;
+  const { listId, name, noteId } = req.body;
   // Get the person who note is being wriiten for with name and list id
   try {
     const viewUser = await new Promise((resolve, reject) =>
       db.all(
         "SELECT id, name FROM users WHERE name = ? AND _list_id = ?",
-        [username, listId],
+        [name, listId],
         (err, rows) => {
           if (err) {
             reject(err);
