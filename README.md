@@ -3,7 +3,7 @@
 
 [Click here to visit the live version of Christmas List Maker (Beta)](https://christmas-list-maker-production.up.railway.app/)
 
-This is the server for the app. The front-end, created with React, Typescript, and Material UI can be found This project uses an Express server. [HERE](https://github.com/njhaus/christmas-list-maker)
+This is the server for the app. The front-end, created with React, Typescript, and Material UI, can be found [HERE](https://github.com/njhaus/christmas-list-maker)
 ## Overview
 ---
 **Christmas List Maker** is a web application inspired by easily-lost handwritten Christmas lists, too-long email chains, temporary text groups, and randomized gift exchange assignments that never seem quite random enough. The Christmas List Maker makes these problems obsolete by allowing groups of family or friends to make and share Christmas lists, communicate which items they have bought, and even choose who buys for who, all from a single app!
