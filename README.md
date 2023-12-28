@@ -70,9 +70,6 @@ This project is written with React, Typescript, Material UI, and some custom CSS
 ### Known bugs:
 * Refreshing the page (besides the home page) leads to a 404 error.
 * 404 route does not render from react-router.
-* Users are able to input websites that are not formatted correctly.
-* Website links show on user gifts even if no link is available.
-* Names are decapitalized in server but not in client, leading to mismatches when logging in.
 
 
 ### Upcoming features:
