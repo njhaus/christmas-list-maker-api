@@ -99,7 +99,7 @@ app.post("/home/new", async (req, res) => {
       [newListId, title, hashedCode, listToken],
       (err, rows) => {
         if (err) {
-          throw new Error();
+          return res.send({ error: "There was an error creating your list." });
         } else {
           res.cookie("list", listToken, {
             httpOnly: true,
