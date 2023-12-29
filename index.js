@@ -193,7 +193,7 @@ app.post("/home/open", validation.validateGroup, async (req, res) => {
 // __________________________________________________________________________________________________________________________________________
 
 // FIND list
-app.post("/list/find", async (req, res) => {
+app.post("/list/find", validation.validateInputs, async (req, res) => {
   console.log("list/find");
   const { listId } = req.body;
   const token = req.cookies?.list;
@@ -256,7 +256,7 @@ app.post("/list/find", async (req, res) => {
 
 
 // CREATE (or edit) LIST
-app.post("/list/create", async (req, res) => {
+app.post("/list/create", validation.validateInputs, async (req, res) => {
   console.log("list/create");
   const { _id, title, users } = req.body;
   const token = req.cookies?.list;
@@ -290,7 +290,7 @@ app.post("/list/create", async (req, res) => {
       )
     );
 
-    // Insert users and give them the _list_id 
+    // Insert users and give them the _list_id
     for (let user of users) {
       const userId = uuidv4();
       const username = user.name.toLowerCase();
@@ -320,9 +320,9 @@ app.post("/list/create", async (req, res) => {
 // __________________________________________________________________________________________________________________________________________
 
 // CREATE recipients for list
-app.post("/list/recipients", async (req, res) => {
+app.post("/list/recipients", validation.validateInputs, async (req, res) => {
   console.log("list/recipients");
-  const { _id: listId, title, users  } = req.body;
+  const { _id: listId, title, users } = req.body;
   const token = req.cookies?.list;
 
   if (!token) {
@@ -354,7 +354,7 @@ app.post("/list/recipients", async (req, res) => {
 
     // UPDATE USERS ASSOCIATED WITH LIST
     for (let user of users) {
-      const recipientString = user.recipients.join(', ');
+      const recipientString = user.recipients.join(", ");
       const username = user.name;
       const usersSql =
         "UPDATE users SET recipients = ? WHERE name = ? AND _list_id = ?";
@@ -370,7 +370,7 @@ app.post("/list/recipients", async (req, res) => {
     }
 
     return res.send({
-      message: "success"
+      message: "success",
     });
   } catch (err) {
     console.log(err);
@@ -422,6 +422,10 @@ app.post("/user/create", validation.validateUserCode,async (req, res) => {
         }
       })
     );
+
+    if (!getUser) {
+      return res.send({ error: "Name not found on this list. Make sure the name you type matches your name on this list! (Not case sensitive.)" })
+    }
 
     res.cookie("user", token, {
       httpOnly: true,
@@ -482,7 +486,10 @@ app.post("/user/access", validation.validateUserCode, async (req, res) => {
 
     if (getUser.length < 1) {
       console.log("no user found");
-      return res.send({ error: "Unable to verify credentials." });
+      return res.send({
+        error:
+          "Name not found on this list. Make sure the name you type matches your name on this list! (Not case sensitive.)",
+      });
     } else if (
       getUser[0].access_code == "null" ||
       getUser[0].access_code == null ||
@@ -528,7 +535,7 @@ app.post("/user/access", validation.validateUserCode, async (req, res) => {
 // __________________________________________________________________________________________________________________________________________
 
 // FIND/CHECK LOGGED IN USER
-app.post("/user/find", async (req, res) => {
+app.post("/user/find", validation.validateInputs, async (req, res) => {
   console.log("user/find");
   const token = req.cookies?.user;
   if (!token) {
@@ -572,7 +579,7 @@ app.post("/user/find", async (req, res) => {
 
 
 // Get user's list -- return edit user OR view user (From UserRouter component)
-app.post("/user/data", async (req, res) => {
+app.post("/user/data", validation.validateInputs, async (req, res) => {
   console.log("user/data");
   // Tokens find current User
   const listToken = req.cookies?.list;
@@ -697,8 +704,7 @@ app.post("/user/data", async (req, res) => {
 
 // Make new user gift
 
-app.post('/user/gift/new', async (req, res) => {
-  
+app.post("/user/gift/new", validation.validateInputs, async (req, res) => {
   const userToken = req.cookies?.user;
   const { giftDescription, link, listId } = req.body;
   // Get user id with token and list id
@@ -741,14 +747,12 @@ app.post('/user/gift/new', async (req, res) => {
         id: newGiftId,
         description: giftDescription,
         link: link,
-      }
+      },
     });
-
   } catch (err) {
-    return res.send({error: "There was an error saving your gift"})
+    return res.send({ error: "There was an error saving your gift" });
   }
-
-})
+});
 
 
 
@@ -756,8 +760,7 @@ app.post('/user/gift/new', async (req, res) => {
 
 // Edit a user gift
 
-app.post('/user/gift/edit', async (req, res) => {
-  
+app.post("/user/gift/edit", validation.validateInputs, async (req, res) => {
   const userToken = req.cookies?.user;
   const { giftId, giftDescription, link, listId } = req.body;
   // Get user id with token and list id
@@ -799,21 +802,19 @@ app.post('/user/gift/edit', async (req, res) => {
         id: giftId,
         description: giftDescription,
         link: link,
-      }
+      },
     });
-
   } catch (err) {
-    return res.send({error: "There was an error saving your gift"})
+    return res.send({ error: "There was an error saving your gift" });
   }
-})
+});
 
 
 // __________________________________________________________________________________________________________________________________________
 
 // Delete a user gift
 
-app.post('/user/gift/delete', async (req, res) => {
-  
+app.post("/user/gift/delete", validation.validateInputs, async (req, res) => {
   const userToken = req.cookies?.user;
   const { giftId, listId } = req.body;
   // Get user id with token and list id
@@ -852,22 +853,20 @@ app.post('/user/gift/delete', async (req, res) => {
     return res.send({
       message: "success",
       deletedGift: {
-        id: giftId
-      }
+        id: giftId,
+      },
     });
-
   } catch (err) {
-    return res.send({error: "There was an error saving your gift"})
+    return res.send({ error: "There was an error saving your gift" });
   }
-
-})
+});
 
 
 // __________________________________________________________________________________________________________________________________________
 
 // Buy a user gift
 
-app.post('/user/gift/buy', async (req, res) => {
+app.post("/user/gift/buy", validation.validateInputs, async (req, res) => {
   console.log("/user/gift/buy");
   const userToken = req.cookies?.user;
   const { giftId, bought, listId } = req.body;
@@ -888,7 +887,7 @@ app.post('/user/gift/buy', async (req, res) => {
     );
     if (viewUser.length < 1)
       return res.send({ error: "Error finding Viewed User." });
-    const viewUserName = bought === true ? viewUser[0].name : '';
+    const viewUserName = bought === true ? viewUser[0].name : "";
 
     // Edit gift
     const editedGift = await new Promise((resolve, reject) =>
@@ -909,14 +908,13 @@ app.post('/user/gift/buy', async (req, res) => {
       boughtGift: {
         id: giftId,
         bought: bought,
-        name: viewUserName
-      }
+        name: viewUserName,
+      },
     });
-
   } catch (err) {
-    return res.send({error: "There was an error saving your gift"})
+    return res.send({ error: "There was an error saving your gift" });
   }
-})
+});
 
 
 
@@ -925,16 +923,15 @@ app.post('/user/gift/buy', async (req, res) => {
 
 // Make new note
 
-app.post('/user/note/create', async (req, res) => {
-  
+app.post("/user/note/create", validation.validateInputs, async (req, res) => {
   const userToken = req.cookies?.user;
-  const { noteDescription, listId, username } = req.body;
+  const { noteDescription, listId, name } = req.body;
   // Get the person who note is being wriiten for with user id with name and list id
   try {
     const viewUser = await new Promise((resolve, reject) =>
       db.all(
         "SELECT id, name FROM users WHERE name = ? AND _list_id = ?",
-        [username, listId],
+        [name, listId],
         (err, rows) => {
           if (err) {
             reject(err);
@@ -987,15 +984,13 @@ app.post('/user/note/create', async (req, res) => {
       newNote: {
         id: newNoteId,
         description: noteDescription,
-        written_by: writingUserName
-      }
+        written_by: writingUserName,
+      },
     });
-
   } catch (err) {
-    return res.send({error: "There was an error saving your note"})
+    return res.send({ error: "There was an error saving your note" });
   }
-
-})
+});
 
 
 
@@ -1003,8 +998,7 @@ app.post('/user/note/create', async (req, res) => {
 
 // Delete note
 
-app.post('/user/note/delete', async (req, res) => {
-  
+app.post("/user/note/delete", validation.validateInputs, async (req, res) => {
   const userToken = req.cookies?.user;
   const { listId, name, noteId } = req.body;
   // Get the person who note is being wriiten for with name and list id
@@ -1062,15 +1056,13 @@ app.post('/user/note/delete', async (req, res) => {
     return res.send({
       message: "success",
       deletedNote: {
-        id: noteId
-      }
+        id: noteId,
+      },
     });
-
   } catch (err) {
-    return res.send({error: "There was an error saving your note"})
+    return res.send({ error: "There was an error saving your note" });
   }
-
-})
+});
 
 
 
@@ -1078,7 +1070,7 @@ app.post('/user/note/delete', async (req, res) => {
 
 
 // LOGOUT
-app.post("/logout", async (req, res) => {
+app.post("/logout", validation.validateInputs, async (req, res) => {
   res.clearCookie("list", {
     httpOnly: true,
     secure: true,
