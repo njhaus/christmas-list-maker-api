@@ -5,11 +5,14 @@ dotenv.config({ silent: process.env.NODE_ENV === "production" });
 const app = express();
 const port = process.env.PORT;
 
+// const origin = "http://localhost:5173";
+const origin =
+  "https://https://christmas-list-maker-production.up.railway.app/";
 // cors middleware for allowing react to fetch() from server
 var cors = require("cors");
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: origin,
     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD", "PATCH"],
     credentials: true,
     preflightContinue: false,
