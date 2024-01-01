@@ -7,7 +7,7 @@ const port = process.env.PORT;
 
 // const origin = "http://localhost:5173";
 const origin =
-  "https://christmas-list-maker-production.up.railway.app/home";
+  "https://christmas-list-maker-production.up.railway.app";
 // cors middleware for allowing react to fetch() from server
 var cors = require("cors");
 app.use(
